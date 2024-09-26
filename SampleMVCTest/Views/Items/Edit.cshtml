@@ -1,0 +1,91 @@
+﻿@model SampleMVCTest.Models.Item
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+
+@{
+    ViewBag.Title = "Edit";
+}
+
+<input type="hidden" id="itemId" value="@Model.Id" />
+<h2>Update Item</h2>
+<div id="form-container">
+    <form id="updateItemForm">
+        <div class="form-group">
+            <label for="updateName">Name:</label>
+            <input type="text" name="Name" id="updateName" class="form-control" required />
+        </div>
+        <div class="form-group">
+            <label for="updateDescription">Description:</label>
+            <input type="text" name="Description" id="updateDescription" class="form-control" required />
+        </div>
+        <input type="submit" class="btn btn-primary" value="Submit" />
+        @*<button type="button" class="btn btn-primary" onclick="updateItem()">Update</button>*@
+    </form>
+</div>
+    <div>
+        @Html.ActionLink("Back to List", "Index")
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            var itemId = $('#itemId').val();
+            loadItemForUpdate(itemId);
+
+            $("#updateItemForm").validate({
+                rules: {
+                    Name: "required",
+                    Description: "required"
+                },
+                messages: {
+                    Name: "Please enter Name",
+                    Description: "Please enter Description"
+                },
+                submitHandler: function (form) {
+                    console.log("Form is valid!");
+                    updateItem(); // Call your submit logic here
+                }
+            });
+        });
+
+
+        function loadItemForUpdate(itemId) {
+            $.ajax({
+                url: '/api/ItemsApi/' + itemId,
+                method: 'GET',
+                success: function (data) {
+                    $('#itemId').val(data.Id);
+                    $('#updateName').val(data.Name);
+                    $('#updateDescription').val(data.Description);
+                },
+                error: function () {
+                    alert('Failed to load item.');
+                }
+            });
+        }
+
+        function updateItem() {
+            var itemId = $('#itemId').val();
+            var item = {
+                Name: $('#updateName').val(),
+                Description: $('#updateDescription').val()
+            };
+
+            $.ajax({
+                url: '/api/ItemsApi/' + itemId,
+                method: 'PUT',
+                contentType: 'application/json',
+                data: JSON.stringify(item),
+                success: function () {
+                    alert('Item updated successfully!');
+                    window.location.href = '/Items';
+                },
+                error: function () {
+                    alert('Failed to update item.');
+                }
+            });
+        }
+    </script>

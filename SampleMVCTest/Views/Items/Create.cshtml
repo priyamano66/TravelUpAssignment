@@ -1,0 +1,78 @@
+﻿@model SampleMVCTest.Models.Item
+
+@{
+    ViewBag.Title = "Create";
+}
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+
+
+<h2>Create</h2>
+
+<div id="form-container">
+    <form id="itemForm">
+        <div class="form-group">
+            <label for="Name">Item Name:</label>
+            <input type="text" name="Name" class="form-control" id="txt_name" required />
+        </div>
+        <div class="form-group">
+            <label for="Description">Description:</label>
+            <input type="text" name="Description" class="form-control" id="txt_desc" required />
+        </div> 
+        <input type="submit"  class="btn btn-primary" value="Submit" />
+    </form>
+</div>
+
+<div id="divmessage"></div>
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+<script>
+
+    $(document).ready(function () {
+        $("#itemForm").validate({
+            rules: {
+                Name: "required",
+                Description: "required"
+            },
+            messages: {
+                Name: "Please enter Name",
+                Description: "Please enter Description"
+            },
+            submitHandler: function (form) {
+                console.log("Form is valid!");
+                submitForm(); // Call your submit logic here
+            }
+        });
+    });
+
+    function submitForm() {
+        var item = {
+            Name: $('#txt_name').val(),
+            Description: $('#txt_desc').val()
+        };
+        // Example of form submission via AJAX
+        $.ajax({
+            url: '@Url.Content("~/api/ItemsApi/AddItem")', // Change this to your actual API endpoint
+            type: "POST",
+            data: JSON.stringify(item), // Serialize form data
+            contentType: 'application/json; charset=utf-8',
+            success: function (response) {
+                alert("Item added successfully!");
+                $('#itemForm')[0].reset();
+                window.location.href = '/Items';
+
+                // Optionally redirect or update the UI
+            },
+            error: function (xhr, status, error) {
+                alert("Failed to create item: " + xhr.responseText);
+            }
+        });
+    }
+</script>

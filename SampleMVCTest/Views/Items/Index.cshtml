@@ -1,0 +1,162 @@
+﻿@model IEnumerable<SampleMVCTest.Models.Item>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+
+<!-- jQuery library -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+
+
+<!-- Latest compiled JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js" type="text/javascript"></script>
+
+<h2>Index</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create")
+</p>
+<table id="itemsTable" class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Description)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+
+    @*@foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @item.Id
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }) |
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }) |
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id })
+                </td>
+            </tr>
+        }*@
+
+</table>
+
+<!-- Modal to display details -->
+<!--<div class="modal fade" id="itemDetailsModal" tabindex="-1" role="dialog" aria-labelledby="itemDetailsLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="itemDetailsLabel">Item Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>ID:</strong> <span id="itemId"></span></p>
+                <p><strong>Name:</strong> <span id="itemName"></span></p>
+                <p><strong>Description:</strong> <span id="itemDescription"></span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>-->
+
+<div id="detailsSection" style="display: none;">
+    <h3>Item Details</h3>
+    <p><strong>ID:</strong> <span id="itemId"></span></p>
+    <p><strong>Name:</strong> <span id="itemName"></span></p>
+    <p><strong>Description:</strong> <span id="itemDescription"></span></p>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+            loadItems();
+        });
+
+        // Function to load items from API
+        function loadItems() {
+            $.ajax({
+                url: '/api/ItemsApi',
+                method: 'GET',
+                success: function (data) {
+                    var rows = '';
+                    if (data == null || data.length==0)
+                        alert('No data to display');
+                    $.each(data, function (i, item) {
+                        var detailsLink = '<a href="#" onclick="showDetails(' + item.Id + ')">View Details</a>';
+                        var editLink = '<a href="/Items/Edit/' + item.Id + '">Edit</a>';
+                        var deleteLink = '<a href="/Items/Delete/' + item.Id + '">Delete</a>';
+                        rows += '<tr><td>' + item.Id + '</td><td>' + item.Name + '</td><td>' + item.Description + '</td>' + '<td>' + detailsLink + ' | ' + editLink + ' | ' + deleteLink  + '</td>' + '</td> </tr>';
+                    });
+                    $('#itemsTable tbody').html(rows);
+                },
+                error: function () {
+                    alert('Failed to load items.');
+                }
+            });
+            @*$.ajax({
+                url: '@Url.Content("~/api/ItemsApi/GetItems")',  // API endpoint URL
+                type: 'GET',
+                contentType: 'application/json',
+                success: function (items) {
+                    var html = '';
+
+                    // Loop through the items and generate HTML content
+                    $.each(items, function (index, item) {
+                        html += '<div class="item">';
+                        html += '<h3>' + item.Name + '</h3>';
+                        html += '<p>' + item.Description + '</p>';
+                        html += '</div>';
+                    });
+
+                    // Inject the generated HTML into the container
+                    $('#items-container').html(html);
+                },
+                error: function () {
+                    $('#items-container').text("Failed to load items.");
+                }
+            });*@
+        }
+
+        // Function to fetch and show item details using AJAX
+        function showDetails(id) {
+            $.ajax({
+                url: '/api/ItemsApi/' + id,
+                method: 'GET',
+                success: function (data) {
+                    // Populate the details section
+                    $('#itemId').text(data.Id);
+                    $('#itemName').text(data.Name);
+                    $('#itemDescription').text(data.Description);
+
+                    // Show the section
+                    $('#detailsSection').show();
+                },
+                error: function () {
+                    alert('Failed to load item details.');
+                }
+            });
+        }
+</script>
